@@ -1,14 +1,19 @@
 import { useState } from 'react';
 import axios from 'axios';
-import { Box, Button, Heading, Input, Text } from '@chakra-ui/react';
+import { Box, Button, FormControl, FormErrorMessage, FormHelperText, FormLabel, Heading, Input, Text } from '@chakra-ui/react';
 
 const SignUp = () => {
-    const [name, setName] = useState('');
-    const [email, setEmail] = useState('');
-    const [username, setUsername] = useState('');
-    const [password, setPassword] = useState('');
+    const [name, setName] = useState("");
+    const [email, setEmail] = useState("");
+    const [username, setUsername] = useState("");
+    const [password, setPassword] = useState("");
+    const [submitClicked, setSubmitClicked] = useState(false);
+
+    const isErrorName = name === "" && submitClicked;
+    const isErrorEmail = email === "" && submitClicked;
 
     const onChangeName = (e: any) => {
+        setSubmitClicked(false);
         console.log(e.target.value);
         setName(e.target.value);
     };
@@ -29,6 +34,7 @@ const SignUp = () => {
     };
 
     const onSubmit = () => {
+        setSubmitClicked(true);
         axios.post("http://localhost:3025/auth/sign-up", {
             name, 
             email, 
@@ -36,6 +42,10 @@ const SignUp = () => {
             password,
         }).then((res) => {
             console.log("RESPONSE", res);
+            setName("");
+            setEmail("");
+            setUsername("");
+            setPassword("");
         });
     };
         
@@ -43,21 +53,36 @@ const SignUp = () => {
         <Box>
             <Heading textAlign="center" mb={4}>Create an Account</Heading>
             <Box maxW="75%" display="flex" flexDirection="column" alignItems="center" margin="0 auto" gap="4">
-                <Box display="flex" flexDirection="column" gap="2" w="100%">
-                    <Text>Name: </Text>
-                    <Input type="text" onChange={onChangeName} />
-                </Box>
-                <Box display="flex" flexDirection="column" gap="2" w="100%">
+                
+
+
+                <FormControl isInvalid={isErrorName} isRequired>
+                <FormLabel>Name</FormLabel>
+                <Input type='text' value={name} onChange={onChangeName} />
+                {!isErrorName ? null : (
+                    <FormErrorMessage>Name is required.</FormErrorMessage>
+                )}
+                </FormControl>
+
+                <FormControl isInvalid={isErrorEmail} isRequired>
+                <FormLabel>Email</FormLabel>
+                <Input type='email' value={name} onChange={onChangeEmail} />
+                {!isErrorName ? null : (
+                    <FormErrorMessage>A valid email is required.</FormErrorMessage>
+                )}
+                </FormControl>
+
+                {/* <Box display="flex" flexDirection="column" gap="2" w="100%">
                     <Text>Email Address: </Text>
-                    <Input type="email" onChange={onChangeEmail} />
-                </Box>
+                    <Input type="email" onChange={onChangeEmail} value={email} />
+                </Box> */}
                 <Box display="flex" flexDirection="column" gap="2" w="100%">
                     <Text>Username: </Text>
-                    <Input type="text" onChange={onChangeUsername} />
+                    <Input type="text" onChange={onChangeUsername} value={username} />
                 </Box>
                 <Box display="flex" flexDirection="column" gap="2" w="100%">
                     <Text>Password: </Text>
-                    <Input type="password" onChange={onChangePassword} />
+                    <Input type="password" onChange={onChangePassword} value={password} />
                 </Box>
                 <Button w="100%" onClick={onSubmit}>Submit</Button>
             </Box>
