@@ -7,46 +7,62 @@ const SignUp = () => {
     const [email, setEmail] = useState("");
     const [username, setUsername] = useState("");
     const [password, setPassword] = useState("");
-    const [submitClicked, setSubmitClicked] = useState(false);
+    const [submitClickedName, setSubmitClickedName] = useState(false);
+    const [submitClickedEmail, setSubmitClickedEmail] = useState(false);
+    const [submitClickedUsername, setSubmitClickedUsername] = useState(false);
+    const [submitClickedPassword, setSubmitClickedPassword] = useState(false);
 
-    const isErrorName = name === "" && submitClicked;
-    const isErrorEmail = email === "" && submitClicked;
+    const isErrorName = name === "" && submitClickedName;
+    const isErrorEmail = email === "" && submitClickedEmail;
+    const isErrorUsername = username === "" && submitClickedUsername;
+    const isErrorPassword = password === "" && submitClickedPassword;
 
     const onChangeName = (e: any) => {
-        setSubmitClicked(false);
-        console.log(e.target.value);
+        setSubmitClickedName(false);
         setName(e.target.value);
     };
 
     const onChangeEmail = (e: any) => {
-        console.log(e.target.value);
+        setSubmitClickedEmail(false);
         setEmail(e.target.value);
     };
 
     const onChangeUsername = (e: any) => {
-        console.log(e.target.value);
+        setSubmitClickedUsername(false);
         setUsername(e.target.value);
     };
 
     const onChangePassword = (e: any) => {
-        console.log(e.target.value);
+        setSubmitClickedPassword(false);
         setPassword(e.target.value);
     };
 
     const onSubmit = () => {
-        setSubmitClicked(true);
-        axios.post("http://localhost:3025/auth/sign-up", {
-            name, 
-            email, 
-            username, 
-            password,
-        }).then((res) => {
-            console.log("RESPONSE", res);
-            setName("");
-            setEmail("");
-            setUsername("");
-            setPassword("");
-        });
+        setSubmitClickedName(true);
+        setSubmitClickedEmail(true);
+        setSubmitClickedUsername(true);
+        setSubmitClickedPassword(true);
+
+        if (name === "" || email === "" || username === "" || password === "") {
+            console.log("ERROR");
+        } else {
+            axios.post("http://localhost:3025/auth/sign-up", {
+                name, 
+                email, 
+                username, 
+                password,
+            }).then((res) => {
+                console.log("RESPONSE", res);
+                setName("");
+                setEmail("");
+                setUsername("");
+                setPassword("");
+                setSubmitClickedName(false);
+                setSubmitClickedEmail(false);
+                setSubmitClickedUsername(false);
+                setSubmitClickedPassword(false);
+            });
+        }
     };
         
     return (
@@ -54,8 +70,6 @@ const SignUp = () => {
             <Heading textAlign="center" mb={4}>Create an Account</Heading>
             <Box maxW="75%" display="flex" flexDirection="column" alignItems="center" margin="0 auto" gap="4">
                 
-
-
                 <FormControl isInvalid={isErrorName} isRequired>
                 <FormLabel>Name</FormLabel>
                 <Input type='text' value={name} onChange={onChangeName} />
@@ -66,24 +80,28 @@ const SignUp = () => {
 
                 <FormControl isInvalid={isErrorEmail} isRequired>
                 <FormLabel>Email</FormLabel>
-                <Input type='email' value={name} onChange={onChangeEmail} />
-                {!isErrorName ? null : (
+                <Input type='email' value={email} onChange={onChangeEmail} />
+                {!isErrorEmail ? null : (
                     <FormErrorMessage>A valid email is required.</FormErrorMessage>
                 )}
                 </FormControl>
 
-                {/* <Box display="flex" flexDirection="column" gap="2" w="100%">
-                    <Text>Email Address: </Text>
-                    <Input type="email" onChange={onChangeEmail} value={email} />
-                </Box> */}
-                <Box display="flex" flexDirection="column" gap="2" w="100%">
-                    <Text>Username: </Text>
-                    <Input type="text" onChange={onChangeUsername} value={username} />
-                </Box>
-                <Box display="flex" flexDirection="column" gap="2" w="100%">
-                    <Text>Password: </Text>
-                    <Input type="password" onChange={onChangePassword} value={password} />
-                </Box>
+                <FormControl isInvalid={isErrorUsername} isRequired>
+                <FormLabel>Username</FormLabel>
+                <Input type='text' value={username} onChange={onChangeUsername} />
+                {!isErrorUsername ? null : (
+                    <FormErrorMessage>Username is required.</FormErrorMessage>
+                )}
+                </FormControl>
+
+                <FormControl isInvalid={isErrorPassword} isRequired>
+                <FormLabel>Password</FormLabel>
+                <Input type='password' value={password} onChange={onChangePassword} />
+                {!isErrorPassword ? null : (
+                    <FormErrorMessage>Password is required.</FormErrorMessage>
+                )}
+                </FormControl>
+
                 <Button w="100%" onClick={onSubmit}>Submit</Button>
             </Box>
         </Box>
