@@ -1,5 +1,6 @@
-import { Box, Button, Heading, Input, Text } from '@chakra-ui/react';
 import { useState } from 'react';
+import axios from 'axios';
+import { Box, Button, Heading, Input, Text } from '@chakra-ui/react';
 
 const SignUp = () => {
     const [name, setName] = useState('');
@@ -28,10 +29,14 @@ const SignUp = () => {
     };
 
     const onSubmit = () => {
-        console.log('NAME:', name);
-        console.log('EMAIL:', email);
-        console.log('USERNAME: ', username);
-        console.log('PASSWORD: ', password);
+        axios.post("http://localhost:3025/auth/sign-up", {
+            name, 
+            email, 
+            username, 
+            password,
+        }).then((res) => {
+            console.log("RESPONSE", res);
+        });
     };
         
     return (
