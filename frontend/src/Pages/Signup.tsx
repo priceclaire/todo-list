@@ -2,6 +2,32 @@ import { useState } from 'react';
 import axios from 'axios';
 import { Box, Button, FormControl, FormErrorMessage, FormHelperText, FormLabel, Heading, Input, Text } from '@chakra-ui/react';
 
+const isInvalidEmail = (email: string) => {
+    const emailFormat = /\S+@\S+\.\S+/;
+    if (email.match(emailFormat) && email.length > 0) {
+        return false;
+    } else {
+        return true;
+    }
+}
+
+
+
+// function validateEmail(inputText) {
+//     var mailFormat =  /\S+@\S+\.\S+/;
+//     if (inputText.value.match(mailFormat)) {
+//       alert("Valid address!");
+//       return true;
+//     } else {
+//       alert("Invalid address!");
+//       return false;
+//     }
+//   }
+
+
+
+
+
 const SignUp = () => {
     const [name, setName] = useState("");
     const [email, setEmail] = useState("");
@@ -13,7 +39,7 @@ const SignUp = () => {
     const [submitClickedPassword, setSubmitClickedPassword] = useState(false);
 
     const isErrorName = name === "" && submitClickedName;
-    const isErrorEmail = email === "" && submitClickedEmail;
+    const isErrorEmail = isInvalidEmail(email) && submitClickedEmail;
     const isErrorUsername = username === "" && submitClickedUsername;
     const isErrorPassword = password === "" && submitClickedPassword;
 
@@ -43,7 +69,7 @@ const SignUp = () => {
         setSubmitClickedUsername(true);
         setSubmitClickedPassword(true);
 
-        if (name === "" || email === "" || username === "" || password === "") {
+        if (name === "" || isInvalidEmail(email) || username === "" || password === "") {
             console.log("ERROR");
         } else {
             axios.post("http://localhost:3025/auth/sign-up", {
