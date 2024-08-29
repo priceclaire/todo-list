@@ -1,24 +1,27 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Name } from './name.entity';
+// import { Name } from './name.entity';
+import { User } from './users/entities/user.entity';
 import { Repository } from 'typeorm';
 
 @Injectable()
 export class AppService {
   constructor(
-    @InjectRepository(Name)
-    private namesRepository: Repository<Name>,
+    @InjectRepository(User)
+    private namesRepository: Repository<User>,
   ) {}
 
-  async addName(firstName: string, lastName: string) {
+  async addUser(name: string, email: string, username: string, password: string) {
     await this.namesRepository.save({ 
-      first_name: firstName, 
-      last_name: lastName, 
+      name: name, 
+      email: email, 
+      username: username,
+      password: password
     });
-    return await this.getNames();
+    return await this.getUser();
   }
 
-  async getNames() {
+  async getUser() {
     return await this.namesRepository.find();
   }
 }
