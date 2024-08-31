@@ -2,6 +2,7 @@ import { useState } from 'react';
 import axios from 'axios';
 import { Box, Button, FormControl, FormErrorMessage, FormHelperText, FormLabel, Heading, Input, Text, useToast } from '@chakra-ui/react';
 import { useNavigate } from 'react-router-dom';
+import { error } from 'console';
 
 const isInvalidEmail = (email: string) => {
     const emailFormat = /\S+@\S+\.\S+/;
@@ -112,10 +113,31 @@ const SignUp = () => {
                     status: 'success',
                     duration: 3000,
                     isClosable: true,
-                  })
+                  });
+            })
+            .catch((err) => {
+                setName("");
+                setEmail("");
+                setUsername("");
+                setPassword("");
+                setSecondPassword("");
+                setSubmitClickedName(false);
+                setSubmitClickedEmail(false);
+                setSubmitClickedUsername(false);
+                setSubmitClickedPassword(false);
+                setSubmitClickedSecondPassword(false);
+
+                console.log("ERROR", err);
+                toast({
+                    title: "An error occurred",
+                    description: "We were unable to create your account. Please try again",
+                    status: "error",
+                    duration: 3000,
+                    isClosable: true,
+                });
             });
         }
-    };
+    }   
 
     return (
         <Box>
