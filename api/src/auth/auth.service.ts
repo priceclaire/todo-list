@@ -2,7 +2,7 @@ import { BadRequestException, Injectable } from '@nestjs/common';
 import { UsersService } from 'src/users/users.service';
 import * as bcrypt from 'bcrypt';
 import { JwtService } from '@nestjs/jwt';
-import { SignUpDto } from './auth.controller';
+import { LogInDto, SignUpDto } from './auth.controller';
 
 @Injectable()
 export class AuthService {
@@ -40,5 +40,10 @@ export class AuthService {
         const user = await this.userService.createUser(signUpDto);
 
         return await this.createAccessToken(user);
+    }
+
+    async logIn(logInDto: LogInDto) {
+        console.log('LOG IN DTO', logInDto);
+        return 'fake-token';
     }
 }
