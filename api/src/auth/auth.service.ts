@@ -1,4 +1,4 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable, UnauthorizedException } from '@nestjs/common';
 import { UsersService } from 'src/users/users.service';
 import * as bcrypt from 'bcrypt';
 import { JwtService } from '@nestjs/jwt';
@@ -22,9 +22,9 @@ export class AuthService {
     }
 
     async signUp(signUpDto: SignUpDto) {
-        const usernameExists = (await this.userService.findUserByUsername(signUpDto.username)).length > 0;
+        const usernameExists = (await this.userService.findUserByUsername(signUpDto.username))?.username;
 
-        const emailExists = (await this.userService.findUserByEmail(signUpDto.email)).length > 0;
+        const emailExists = (await this.userService.findUserByEmail(signUpDto.email))?.email;
 
         if (usernameExists) {
             throw new BadRequestException('Username already exists');
@@ -42,8 +42,36 @@ export class AuthService {
         return await this.createAccessToken(user);
     }
 
+    async verifyPassword(enteredPassword: string, existingPassword: string) {
+        return await bcrypt.compare(enteredPassword, existingPassword);
+    }
+
     async logIn(logInDto: LogInDto) {
-        console.log('LOG IN DTO', logInDto);
-        return 'fake-token';
+        const user = await this.userService.findUserByUsername(logInDto.username);
+        
+        if (!user) {
+            throw new UnauthorizedException('username does not exist');
+        }
+
+        const passwordsMatch = await this.verifyPassword(
+            logInDto.password, 
+            user.password
+        );
+
+        if (!passwordsMatch) {
+            throw new UnauthorizedException('incorrect password');
+        }
+
+        return await this.createAccessToken(user);
+    }
+
+    async getProfileData(username: string) {
+        console.log('USERNAME', username);
+        const user = await this.userService.findUserByUsername(username);
+        return {
+            email: user.email,
+            name: user.name,
+            username: user.username,
+        }
     }
 }

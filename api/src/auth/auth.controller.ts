@@ -49,11 +49,7 @@ export class AuthController {
 
     @UseGuards(AuthGuard) 
     @Get('user-details')
-    getUser(@Request() req) {
-        if (req.user) {
-            return req.user;
-        } else {
-            return 'no user';
-        }
+    getProfileData(@Request() req) {
+        return this.authService.getProfileData(req.user.username);
     }
 }
