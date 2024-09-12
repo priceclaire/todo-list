@@ -1,5 +1,6 @@
 import { Box, Heading, Image } from '@chakra-ui/react';
 import { Link } from 'react-router-dom';
+import imagePaths from './imagePaths';
 
 const pages = [
   {name: "Log In", path: "/log-in", showWhenLoggedIn: false}, 
@@ -16,7 +17,11 @@ const Header = ({ loggedIn }: Props) => {
   return (
     <Box p={4} display="flex" alignItems="center">
       <Box display="flex" gap={4} alignItems="center"> 
-        <img src="../assets/card-sun.png" alt="Sun" /> 
+        <Image 
+          src={imagePaths.placeholderLogo} 
+          alt="Placeholder" 
+          width="50px"
+        /> 
         <Heading fontSize={24}>Project Planning Tool</Heading>
       </Box>
       <Box display="flex" justifyContent="space-around" width="70%">
