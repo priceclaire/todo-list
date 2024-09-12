@@ -9,11 +9,31 @@ import LogIn from './Pages/Login';
 import Projects from './Pages/Projects';
 import Profile from './Pages/Profile';
 import axios from 'axios';
+import { createStandaloneToast } from '@chakra-ui/react';
+
+const { ToastContainer, toast } = createStandaloneToast();
 
 const router = createBrowserRouter([
   {
     path: "/",
     element: <App />,
+    loader: async () => {
+      const token = localStorage.getItem("token");
+      if (token) {
+        try {
+          const response = await axios.get(
+            "http://localhost:3025/auth/user-details", 
+            { headers: { Authorization: `Bearer ${token}` } }
+          );
+          return response.data;
+        } catch (error) {
+          return {};
+        }
+      } else {
+        return {};
+      }
+    },
+
     children: [
       {
         path: "sign-up",
@@ -43,12 +63,24 @@ const router = createBrowserRouter([
               );
               return response.data;
             } catch (error) {
-              // if you have an expired token, we will show an error toast and redirect the user to the login page
-              console.log("ERROR", error);
+              // if you have an expired token, show an error toast and redirect the user to the login page
+              toast({
+                title: "An error occured",
+                description: "You must be signed in to view this page!",
+                status: "error",
+                duration: 3000,
+                isClosable: true,
+              });
               return redirect("/log-in");
             }
           } else {
-            console.log("NO TOKEN");
+            toast({
+              title: "An error occured",
+              description: "You must have an account to view this page!",
+              status: "error",
+              duration: 3000,
+              isClosable: true,
+            });
             return redirect("/sign-up");
           }
             
@@ -69,6 +101,7 @@ const root = ReactDOM.createRoot(
 
 root.render(
   <React.StrictMode>
+    <ToastContainer />
     <RouterProvider router={router} />
   </React.StrictMode>
 );
