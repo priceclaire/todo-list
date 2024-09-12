@@ -1,29 +1,37 @@
-import React, { useState } from 'react';
-import { Box, Button, ChakraProvider, Input } from '@chakra-ui/react';
-import axios from 'axios';
+import { ChakraProvider } from '@chakra-ui/react';
+import { Outlet, useLoaderData } from 'react-router-dom';
+import Header from './Components/Header';
+import { useState } from 'react';
+
+type Data = {
+  email: string;
+  username: string;
+  name: string;
+}
+
+export type Context = {
+  loggedIn: boolean;
+  toggleLoggedIn: () => void;
+};
 
 function App() {
-  const [name, setName] = useState("test name 3");
+  const data = useLoaderData() as Data | undefined;
+  const [loggedIn, setLoggedIn] = useState(data?.username !== undefined);
 
-  const onChange = (event: any) => {
-    setName(event.target.value);
+  const toggleLoggedIn = () => {
+    setLoggedIn(!loggedIn);
   };
 
-  const onClick = async () => {
-    const response = await axios.post('http://localhost:3025/name', {
-      name,
-    });
-    console.log("RESPONSE", response.data);
+  const context: Context = {
+    loggedIn,
+    toggleLoggedIn
   };
 
+  console.log("LOGGED IN:", loggedIn);
   return (
     <ChakraProvider>
-      <Box m={10} display="flex" gap={4}>
-        <Input onChange={onChange} placeholder="Type in a name..." />
-        <Button colorScheme='purple'onClick={onClick}>
-          Add Name
-        </Button>
-      </Box>
+      <Header loggedIn={loggedIn} />
+      <Outlet context={context} />
     </ChakraProvider>
   );
 }
