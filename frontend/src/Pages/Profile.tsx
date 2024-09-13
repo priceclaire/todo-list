@@ -2,7 +2,6 @@ import React from "react";
 import { Avatar, Box, Button, IconButton, Text, useToast } from "@chakra-ui/react";
 import { useLoaderData, useNavigate, useOutletContext } from "react-router-dom";
 import { Context } from "../App";
-import { EditIcon } from "@chakra-ui/icons";
 import UserDetailsRow from "../Components/Profile/UserDetailsRow";
 
 type Data = {
@@ -16,8 +15,6 @@ const Profile = () => {
     const navigate = useNavigate();
     const toast = useToast();
     const context = useOutletContext() as Context;
-
-    console.log("PROFILE DATA: ", data);
 
     const logOut = () => {
         localStorage.removeItem("token");
@@ -52,21 +49,6 @@ const Profile = () => {
                     <UserDetailsRow field="Email Address" value={data.email} />
                     <UserDetailsRow field="Username" value={data.username} />
                     <UserDetailsRow field="Password" value="********" />
-                    {/* <Box display="flex">
-                        <Text flex={1} lineHeight="32px">Email address:</Text>
-                        <Text flex={1} lineHeight="32px">{data.email}</Text>
-                        <IconButton aria-label="Edit Email Address" icon={<EditIcon />} size="sm"/>
-                    </Box>
-                    <Box display="flex">
-                        <Text flex={1} lineHeight="32px">Username:</Text>
-                        <Text flex={1} lineHeight="32px">{data.username}</Text>
-                        <IconButton aria-label="Edit Username" icon={<EditIcon />} size="sm"/>
-                    </Box>
-                    <Box display="flex">
-                        <Text flex={1} lineHeight="32px">Password:</Text>
-                        <Text flex={1} lineHeight="32px">********</Text>
-                        <IconButton aria-label="Edit Password" icon={<EditIcon />} size="sm"/>
-                    </Box> */}
                 </Box>
             </Box>
             <Box display="flex" gap={4} justifyContent="center">
