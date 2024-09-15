@@ -9,7 +9,7 @@ type Props = {
     username: string;
 };
 
-const UserDetailsRow = ({field, value, username}: Props) => {
+const UserDetailsRow = ({ field, value, username }: Props) => {
     const [updateField, setUpdateField] = useState(false);
     const [valueState, setValueState] = useState(value);
 
@@ -30,15 +30,18 @@ const UserDetailsRow = ({field, value, username}: Props) => {
         setUpdateField(!updateField);
 
         axios
-            .post("http://localhost:3025/auth/change-account-detail", {
-                field,
-                value: valueState,
-                username,
-            }, { headers: { Authorization: "Bearer ${token}" } }
-        )
-        .then((response) => {
-            console.log("RESPONSE", response.data);
-        })
+            .post(
+                "http://localhost:3025/auth/change-account-detail", 
+                {
+                    username,
+                    field: field.toLowerCase(),
+                    value: valueState,
+                }, 
+                { headers: { Authorization: `Bearer ${token}` } }
+            )
+            .then((response) => {
+                console.log("RESPONSE", response.data);
+            });
     };
 
     return (
