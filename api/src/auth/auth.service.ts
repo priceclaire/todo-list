@@ -70,15 +70,21 @@ export class AuthService {
         const user = await this.userService.findUserByUsername(
             accountDetailDto.username,
         );
-        // update the field in question on that user
-        user[accountDetailDto.field] = accountDetailDto.value;
+        if (accountDetailDto.field === 'password') {
+            const plainTextPassword = accountDetailDto.value;
+            const hashedPassword = await this.hashPassword(plainTextPassword);
+            // update the field in question on that user
+            user[accountDetailDto.field] = hashedPassword;
+        } else {
+            user[accountDetailDto.field] = accountDetailDto.value;
+        }
+        
         // save the user in database
         return await this.userService.createUser(user);
         // return user data
     }
 
     async getProfileData(username: string) {
-        console.log('USERNAME', username);
         const user = await this.userService.findUserByUsername(username);
         return {
             email: user.email,

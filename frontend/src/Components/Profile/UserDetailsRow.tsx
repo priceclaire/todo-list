@@ -1,7 +1,8 @@
 import { CheckIcon, EditIcon } from "@chakra-ui/icons";
-import { Box, Text, IconButton, Input } from "@chakra-ui/react";
+import { Box, Text, IconButton, Input, useToast } from "@chakra-ui/react";
 import axios from "axios";
 import { useState } from "react";
+import { isInvalidEmail } from "../../Pages/Signup";
 
 type Props = {
     field: string;
@@ -10,6 +11,7 @@ type Props = {
 };
 
 const UserDetailsRow = ({ field, value, username }: Props) => {
+    const toast = useToast();
     const [updateField, setUpdateField] = useState(false);
     const [valueState, setValueState] = useState(value);
 
@@ -22,10 +24,32 @@ const UserDetailsRow = ({ field, value, username }: Props) => {
     };
 
     const onClickCheck = () => {
+        if (field === "Email") {
+            const invalidEmail = isInvalidEmail(valueState);
+            if (invalidEmail) {
+                toast({
+                    title: 'Error',
+                    description: "Please enter a valid email!",
+                    status: 'error',
+                    duration: 3000,
+                    isClosable: true,
+                  });
+                  return;
+            }
+        } else {
+            if (valueState === "") {
+                toast({
+                    title: 'Error',
+                    description: "Please enter a value!",
+                    status: 'error',
+                    duration: 3000,
+                    isClosable: true,
+                  });
+                  return;
+            }
+        }
+        
         const token = localStorage.getItem("token");
-
-        console.log("TOKEN", token);
-        console.log("USERNAME", username);
 
         setUpdateField(!updateField);
 
@@ -41,6 +65,13 @@ const UserDetailsRow = ({ field, value, username }: Props) => {
             )
             .then((response) => {
                 console.log("RESPONSE", response.data);
+                toast({
+                    title: 'Success!',
+                    description: "We have updated your account details",
+                    status: 'success',
+                    duration: 3000,
+                    isClosable: true,
+                  });
             });
     };
 
@@ -48,9 +79,16 @@ const UserDetailsRow = ({ field, value, username }: Props) => {
         <Box display="flex" gap={2}>
             <Text flex={1} lineHeight="32px">{field}:</Text>
             {updateField ? (
-                <Input value={valueState} flex={1} h="32px" onChange={onChange} />
+                <Input 
+                    value={valueState} 
+                    flex={1} h="32px" 
+                    onChange={onChange} 
+                    type={field === "Password" ? "password" : "text"} 
+                />
                 ) : (
-                <Text flex={1} lineHeight="32px">{valueState}</Text>
+                    <Text flex={1} lineHeight="32px">
+                        {field === "Password" ? "********" : valueState}
+                    </Text>
                 )}
             <IconButton 
                 aria-label="Edit" 
