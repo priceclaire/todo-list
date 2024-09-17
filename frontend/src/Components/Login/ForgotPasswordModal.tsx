@@ -9,33 +9,65 @@ import {
   Input,
   Button,
   Text,
+  useToast,
 } from "@chakra-ui/react";
 import axios from "axios";
 import { useState } from "react";
+import { isInvalidEmail } from "../../Pages/Signup";
 
 type Props = {
-    isOpen: boolean;
-    onClose: () => void;
+  isOpen: boolean;
+  onClose: () => void;
 };
 
 const ForgotPasswordModal = ({ isOpen, onClose }: Props) => {
-    const [email, setEmail] = useState("");
+  const toast = useToast();
+  const [email, setEmail] = useState("");
 
-    const saveEmail = (e: any) => { 
-        setEmail(e.target.value);
-    };
+  const saveEmail = (e: any) => {
+    setEmail(e.target.value);
+  };
 
-    const submitEmail = () => {
-        console.log("EMAIL: ", email);
-        axios
-            .post("http://localhost:3025/auth/reset-password", {
-                email,
-            })
-            .then((response) => {
-                console.log(response.data);
-            });
-        onClose();
-    };
+  const submitEmail = () => {
+    console.log("EMAIL: ", email);
+    const invalidEmail = isInvalidEmail(email);
+    if (invalidEmail) {
+      toast({
+        title: "Error",
+        description: "Please enter a valid email address!",
+        status: "error",
+        duration: 3000,
+        isClosable: true,
+      });
+    } else {
+      axios
+        .post("http://localhost:3025/auth/reset-password", {
+          email,
+        })
+        .then((response) => {
+          setEmail("");
+          console.log(response.data);
+          toast({
+            title: "Success",
+            description: "Check your email account for further directions!",
+            status: "success",
+            duration: 3000,
+            isClosable: true,
+          });
+        })
+        .catch((error) => {
+          console.log("ERROR: ", error);
+          toast({
+            title: "Error",
+            description: error.response.data.message,
+            status: "error",
+            duration: 3000,
+            isClosable: true,
+          });
+        });
+    }
+    onClose();
+  };
 
   return (
     <Modal isOpen={isOpen} onClose={onClose}>
