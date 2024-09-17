@@ -68,6 +68,11 @@ export class AuthController {
     @UseGuards(AuthGuard) 
     @Get('user-details')
     getProfileData(@Request() req) {
-        return this.authService.getProfileData(req.user.username);
+        return this.authService.getProfileData(req.user.sub);
+    }
+
+    @Post('reset-password')
+    sendResetPasswordEmail(@Body('email') email: string) {
+        console.log('EMAIL: ', email);
     }
 }

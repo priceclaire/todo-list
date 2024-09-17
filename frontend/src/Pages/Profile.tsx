@@ -1,17 +1,18 @@
-import React from "react";
+import React, { useState } from "react";
 import { Avatar, Box, Button, IconButton, Text, useToast } from "@chakra-ui/react";
 import { useLoaderData, useNavigate, useOutletContext } from "react-router-dom";
 import { Context } from "../App";
 import UserDetailsRow from "../Components/Profile/UserDetailsRow";
 
-type Data = {
+export type Data = {
     email: string;
     name: string;
     username: string;
 };
 
 const Profile = () => {
-    const data = useLoaderData() as Data;
+    const loaderData = useLoaderData() as Data;
+    const [data, setData] = useState(loaderData);
     const navigate = useNavigate();
     const toast = useToast();
     const context = useOutletContext() as Context;
@@ -45,10 +46,10 @@ const Profile = () => {
                         src="" />
                 </Box>
                 <Box w="100%" display="flex" flexDirection="column" gap={3}>
-                    <UserDetailsRow field="Name" value={data.name} username={data.username}/>
-                    <UserDetailsRow field="Email" value={data.email} username={data.username} />
-                    <UserDetailsRow field="Username" value={data.username} username={data.username} />
-                    <UserDetailsRow field="Password" value="********" username={data.username} />
+                    <UserDetailsRow field="Name" value={data.name} username={data.username} setData={setData}/>
+                    <UserDetailsRow field="Email" value={data.email} username={data.username} setData={setData} />
+                    <UserDetailsRow field="Username" value={data.username} username={data.username} setData={setData} />
+                    <UserDetailsRow field="Password" value="********" username={data.username} setData={setData} />
                 </Box>
             </Box>
             <Box display="flex" gap={4} justifyContent="center">

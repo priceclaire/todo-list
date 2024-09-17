@@ -3,14 +3,16 @@ import { Box, Text, IconButton, Input, useToast } from "@chakra-ui/react";
 import axios from "axios";
 import { useState } from "react";
 import { isInvalidEmail } from "../../Pages/Signup";
+import { Data } from "../../Pages/Profile";
 
 type Props = {
     field: string;
     value: string;
     username: string;
+    setData: React.Dispatch<React.SetStateAction<Data>>
 };
 
-const UserDetailsRow = ({ field, value, username }: Props) => {
+const UserDetailsRow = ({ field, value, username, setData }: Props) => {
     const toast = useToast();
     const [updateField, setUpdateField] = useState(false);
     const [valueState, setValueState] = useState(value);
@@ -65,13 +67,26 @@ const UserDetailsRow = ({ field, value, username }: Props) => {
             )
             .then((response) => {
                 console.log("RESPONSE", response.data);
+                setData(response.data);
                 toast({
-                    title: 'Success!',
-                    description: "We have updated your account details",
+                    title: 'Success',
+                    description: 
+                        "We have updated your account details!",
                     status: 'success',
                     duration: 3000,
                     isClosable: true,
-                  });
+                });
+            })
+            .catch((error) => {
+                console.log("ERROR: ", error);  
+                toast({
+                    title: 'Error',
+                    description: 
+                        "There was an error. Please review your values and try again!",
+                    status: 'error',
+                    duration: 3000,
+                    isClosable: true,
+                }); 
             });
     };
 

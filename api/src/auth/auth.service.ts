@@ -3,6 +3,7 @@ import { UsersService } from 'src/users/users.service';
 import * as bcrypt from 'bcrypt';
 import { JwtService } from '@nestjs/jwt';
 import { AccountDetailDto, LogInDto, SignUpDto } from './auth.controller';
+import e from 'express';
 
 @Injectable()
 export class AuthService {
@@ -17,7 +18,7 @@ export class AuthService {
     }
 
     async createAccessToken(user) {
-        const payload = { username: user.username, sub: user.id };
+        const payload = { sub: user.id };
         return this.jwtService.sign(payload, { secret: process.env.JWT_SECRET });
     }
 
@@ -80,12 +81,17 @@ export class AuthService {
         }
         
         // save the user in database
-        return await this.userService.createUser(user);
+        const updatedUser = await this.userService.createUser(user);
+        return {
+            name: updatedUser.name,
+            email: updatedUser.email,
+            username: updatedUser.username,
+        }
         // return user data
     }
 
-    async getProfileData(username: string) {
-        const user = await this.userService.findUserByUsername(username);
+    async getProfileData(id: number) {
+        const user = await this.userService.findUserById(id);
         return {
             email: user.email,
             name: user.name,
