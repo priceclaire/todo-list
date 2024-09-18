@@ -3,12 +3,14 @@ import { UsersService } from 'src/users/users.service';
 import * as bcrypt from 'bcrypt';
 import { JwtService } from '@nestjs/jwt';
 import { AccountDetailDto, LogInDto, SignUpDto } from './auth.controller';
-import e from 'express';
+import { User } from 'src/users/entities/user.entity';
+import { MailService } from 'src/mail/mail.service';
 
 @Injectable()
 export class AuthService {
     constructor(
         private userService: UsersService,
+        private mailService: MailService,
         private jwtService: JwtService,
     ) {}
 
@@ -17,9 +19,21 @@ export class AuthService {
         return await bcrypt.hash(password, saltRounds);
     }
 
-    async createAccessToken(user) {
+    // async createAccessToken(user) {
+    //     const payload = { sub: user.id };
+    //     return this.jwtService.sign(payload, { secret: process.env.JWT_SECRET });
+    // }
+
+    async createAccessToken(user: User, secret?: string) {
         const payload = { sub: user.id };
-        return this.jwtService.sign(payload, { secret: process.env.JWT_SECRET });
+        if (secret) {
+            return this.jwtService.sign(payload, {
+                secret,
+                expiresIn: '10m',
+            });
+        } else {
+            return this.jwtService.sign(payload);
+        }
     }
 
     async signUp(signUpDto: SignUpDto) {
@@ -82,12 +96,12 @@ export class AuthService {
         
         // save the user in database
         const updatedUser = await this.userService.createUser(user);
+        // return user data
         return {
             name: updatedUser.name,
             email: updatedUser.email,
             username: updatedUser.username,
         }
-        // return user data
     }
 
     async getProfileData(id: number) {
@@ -97,5 +111,19 @@ export class AuthService {
             name: user.name,
             username: user.username,
         }
+    }
+
+    async sendResetPasswordEmail(email: string) {
+        const user = await this.userService.findUserByEmail(email);
+
+        if (user === null) {
+            throw new BadRequestException('Email not found');
+        }
+
+        // create a JWT with the users current hashed password as secret
+        const token = await this.createAccessToken(user, user.password);
+       
+        // send an email to the user with a link to a reset password page on the frontend with the JWT and userID as param
+        return await this.mailService.sendPasswordResetEmail(user, token);
     }
 }
