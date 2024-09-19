@@ -1,15 +1,17 @@
-import React from 'react';
-import ReactDOM from 'react-dom/client';
-import './index.css';
-import App from './App';
-import { RouterProvider, createBrowserRouter } from 'react-router-dom';
-import { redirect } from 'react-router-dom';
-import SignUp from './Pages/Signup';
-import LogIn from './Pages/Login';
-import Projects from './Pages/Projects';
-import Profile from './Pages/Profile';
-import axios from 'axios';
-import { createStandaloneToast } from '@chakra-ui/react';
+import React from "react";
+import ReactDOM from "react-dom/client";
+import "./index.css";
+import App from "./App";
+import { RouterProvider, createBrowserRouter } from "react-router-dom";
+import { redirect } from "react-router-dom";
+import SignUp from "./Pages/Signup";
+import LogIn from "./Pages/Login";
+import Projects from "./Pages/Projects";
+import Profile from "./Pages/Profile";
+import axios from "axios";
+import { createStandaloneToast } from "@chakra-ui/react";
+import ResetPassword from "./Pages/ResetPassword";
+
 
 const { ToastContainer, toast } = createStandaloneToast();
 
@@ -19,10 +21,11 @@ const router = createBrowserRouter([
     element: <App />,
     loader: async () => {
       const token = localStorage.getItem("token");
+
       if (token) {
         try {
           const response = await axios.get(
-            "http://localhost:3025/auth/user-details", 
+            "http://localhost:3025/auth/user-details",
             { headers: { Authorization: `Bearer ${token}` } }
           );
           return response.data;
@@ -58,7 +61,7 @@ const router = createBrowserRouter([
           if (token) {
             try {
               const response = await axios.get(
-                "http://localhost:3025/auth/user-details", 
+                "http://localhost:3025/auth/user-details",
                 { headers: { Authorization: `Bearer ${token}` } }
               );
               return response.data;
@@ -83,20 +86,20 @@ const router = createBrowserRouter([
             });
             return redirect("/sign-up");
           }
-            
-            
+
           // if user does not have a token we will show in error toast and redirect the user to the sign-up page
-          
-          
-          
-        }
+        },
+      },
+      {
+        path: "reset-password/:token/:id",
+        element: <ResetPassword />,
       },
     ],
-  }
+  },
 ]);
 
 const root = ReactDOM.createRoot(
-  document.getElementById('root') as HTMLElement
+  document.getElementById("root") as HTMLElement
 );
 
 root.render(
