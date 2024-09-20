@@ -1,18 +1,116 @@
-import { EditIcon } from "@chakra-ui/icons";
-import { Box, Text, IconButton } from "@chakra-ui/react";
+import { CheckIcon, EditIcon } from "@chakra-ui/icons";
+import { Box, Text, IconButton, Input, useToast } from "@chakra-ui/react";
+import axios from "axios";
+import { useState } from "react";
+import { isInvalidEmail } from "../../Pages/Signup";
+import { Data } from "../../Pages/Profile";
 
 type Props = {
     field: string;
     value: string;
+    username: string;
+    setData: React.Dispatch<React.SetStateAction<Data>>
 };
 
+const UserDetailsRow = ({ field, value, username, setData }: Props) => {
+    const toast = useToast();
+    const [updateField, setUpdateField] = useState(false);
+    const [valueState, setValueState] = useState(value);
 
-const UserDetailsRow = ({field, value}: Props) => {
+    const onChange = (e: any) => {
+        setValueState(e.target.value);
+    };
+
+    const onClickEdit = () => {
+        setUpdateField(!updateField);
+    };
+
+    const onClickCheck = () => {
+        if (field === "Email") {
+            const invalidEmail = isInvalidEmail(valueState);
+            if (invalidEmail) {
+                toast({
+                    title: 'Error',
+                    description: "Please enter a valid email!",
+                    status: 'error',
+                    duration: 3000,
+                    isClosable: true,
+                  });
+                  return;
+            }
+        } else {
+            if (valueState === "") {
+                toast({
+                    title: 'Error',
+                    description: "Please enter a value!",
+                    status: 'error',
+                    duration: 3000,
+                    isClosable: true,
+                  });
+                  return;
+            }
+        }
+        
+        const token = localStorage.getItem("token");
+
+        setUpdateField(!updateField);
+
+        axios
+            .post(
+                "http://localhost:3025/auth/change-account-detail", 
+                {
+                    username,
+                    field: field.toLowerCase(),
+                    value: valueState,
+                }, 
+                { headers: { Authorization: `Bearer ${token}` } }
+            )
+            .then((response) => {
+                console.log("RESPONSE", response.data);
+                setData(response.data);
+                toast({
+                    title: 'Success',
+                    description: 
+                        "We have updated your account details!",
+                    status: 'success',
+                    duration: 3000,
+                    isClosable: true,
+                });
+            })
+            .catch((error) => {
+                console.log("ERROR: ", error);  
+                toast({
+                    title: 'Error',
+                    description: 
+                        "There was an error. Please review your values and try again!",
+                    status: 'error',
+                    duration: 3000,
+                    isClosable: true,
+                }); 
+            });
+    };
+
     return (
-        <Box display="flex">
+        <Box display="flex" gap={2}>
             <Text flex={1} lineHeight="32px">{field}:</Text>
-            <Text flex={1} lineHeight="32px">{value}</Text>
-            <IconButton aria-label="Edit" icon={<EditIcon />} size="sm"/>
+            {updateField ? (
+                <Input 
+                    value={valueState} 
+                    flex={1} h="32px" 
+                    onChange={onChange} 
+                    type={field === "Password" ? "password" : "text"} 
+                />
+                ) : (
+                    <Text flex={1} lineHeight="32px">
+                        {field === "Password" ? "********" : valueState}
+                    </Text>
+                )}
+            <IconButton 
+                aria-label="Edit" 
+                icon={updateField ? <CheckIcon /> : <EditIcon /> } 
+                size="sm" 
+                onClick={updateField ? onClickCheck : onClickEdit}
+            />
         </Box>
     );
 };
